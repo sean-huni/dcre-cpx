@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.PlatformTransactionManager;
 import za.co.fnb.dcre.pxr.service.ReaderTasklet;
+import za.co.fnb.dcre.platform.batch.CrdbRetryExceptionHandler;
 import za.co.fnb.dcre.platform.batch.OutcomeFileWriter;
 import za.co.fnb.dcre.platform.batch.StaleExecutionSweeper;
 
@@ -27,7 +28,14 @@ public class PxrJobConfig {
     @Bean
     public Job pxrJob(JobRepository repo, PlatformTransactionManager tx, ReaderTasklet tasklet,
                       @Value("${dcre.exchange-root}") String exchangeRoot) {
-        Step readerStep = new StepBuilder("readerStep", repo).tasklet(tasklet, tx).build();
+        // CRDB 40001 retry on the ingest step (the one that WRITES): reply-file
+        // upserts run while heavy writers run concurrently, so commit-time
+        // serialization aborts are expected. Retry, never skip (the handler
+        // covers the chunk-commit boundary). The step tx is THIN (SCRUM-42):
+        // all writes commit in per-slice REQUIRES_NEW transactions inside
+        // ReaderService, so a step-level re-run no-ops over committed slices.
+        Step readerStep = new StepBuilder("readerStep", repo).tasklet(tasklet, tx)
+                .exceptionHandler(new CrdbRetryExceptionHandler("PXR")).build();
         return new JobBuilder("pxrJob", repo)
                 .listener(new SeamListener(exchangeRoot))
                 .start(readerStep)
