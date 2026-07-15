@@ -4,7 +4,7 @@ PBSR response reader: an ephemeral Spring Batch job that ingests Fintegrate PBSR
 
 ## What it does
 
-PXR is the PBSR leg of the DCRE Collections response flow: `IXR | SXR | PXR -> ext_tx_status -> PRG`. When Fintegrate drops a reply file whose name carries the `_PBSR` token into the exchange, AGT's fint-resp route launches PXR as a short-lived Kubernetes Job (unknown reply tokens quarantine fail-closed). PXR parses the reply, one `<OrgnlMsgId>` plus repeated `<Tx>` blocks of `<OrgnlEndToEndId>` + `<TxSts>` + optional `<Rsn>` ([SYNTHETIC-CONTRACT R-35] shape), and upserts one `pbsr_resp` row per Tx block. PBSR carries the final per-transaction statuses and ranks highest in the `ext_tx_status` consolidation (precedence PBSR > SBSR > ISR > AIS/CTV, R-17) that PRG reads.
+PXR is the PBSR leg of the DCRE Collections response flow: `IXR | SXR | PXR -> ext_tx_status -> PRG`. When Fintegrate drops a reply file whose name carries the `_PBSR` token into the exchange, AGT's fint-resp route launches PXR as a short-lived Kubernetes Job (unknown reply tokens quarantine fail-closed). PXR parses the reply, one `<OrgnlMsgId>` plus repeated `<Tx>` blocks of `<OrgnlEndToEndId>` + `<TxSts>` + optional `<Rsn>` ([SYNTHETIC-CONTRACT R-35] shape), and upserts one `pbsr_resp` row per Tx block. PBSR carries the final per-transaction statuses and ranks highest in the `ext_tx_status` consolidation (precedence PBSR > SBSR > ISR > CTV, R-17) that PRG reads.
 
 ## Architecture and principles
 
