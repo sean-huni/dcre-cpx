@@ -79,11 +79,11 @@ Docker required; all DB tests run on Testcontainers `cockroachdb/cockroach:v26.2
 
 # build and load the stage image (tag = fleet release version)
 ./gradlew bootJar
-docker build -t dcre-pxr:2.1.0 .
-kind load docker-image --name dcre-dev dcre-pxr:2.1.0
+docker build -t dcre-pxr:2.1.1 .
+kind load docker-image --name dcre-dev dcre-pxr:2.1.1
 
-# switch the whole fleet to the version (sets AGT_PXR_IMAGE=dcre-pxr:2.1.0 on the AGT deployment)
-(cd ../../../../../infra/dcre-infra && scripts/switch-version.sh 2.1.0)
+# switch the whole fleet to the version (sets AGT_PXR_IMAGE=dcre-pxr:2.1.1 on the AGT deployment)
+(cd ../../../../../infra/dcre-infra && scripts/switch-version.sh 2.1.1)
 ```
 
 The image is `eclipse-temurin:25-jre-alpine` carrying `build/libs/pxr-2.0.jar`. PXR is not deployed as a server: AGT's fint-resp route matches the `_PBSR` filename token and mints a one-shot Kubernetes Job (`backoffLimit: 0`, `restartPolicy: Never`) from `AGT_PXR_IMAGE`, passing `arrival.id` / `input.file` / `original.name` as program args and `JOB_NAME`, `DCRE_DB_URL`, `DCRE_EXCHANGE_ROOT=/exchange` in the env, with the shared exchange PVC mounted at `/exchange`.
