@@ -1,5 +1,6 @@
 package za.co.fnb.dcre.pxr;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.batch.core.BatchStatus;
@@ -50,6 +51,12 @@ class PxrJobTest {
 
     @Autowired
     JdbcTemplate jdbc;
+
+    /** CRW-owned source tables the reader correlates against (never in the pxr changelog). */
+    @BeforeEach
+    void bootstrapCrwSources() {
+        CrwSourceTables.ensure(jdbc);
+    }
 
     // [SYNTHETIC-CONTRACT R-35] reply shape
     static final String REPLY = """

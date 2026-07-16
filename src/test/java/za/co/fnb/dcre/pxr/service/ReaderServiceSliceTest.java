@@ -13,6 +13,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.CockroachContainer;
 import org.testcontainers.utility.DockerImageName;
+import za.co.fnb.dcre.pxr.CrwSourceTables;
 import za.co.fnb.dcre.pxr.data.repo.PbsrRespRepo;
 
 import java.lang.reflect.InvocationTargetException;
@@ -72,6 +73,7 @@ class ReaderServiceSliceTest {
 
     @BeforeEach
     void newReply() {
+        CrwSourceTables.ensure(jdbc);
         String unique = UUID.randomUUID().toString().substring(0, 8);
         responseFile = "20260714_FNB_PBSR_" + unique + "_RESP.xml";
         reply = reply(6);
@@ -134,8 +136,9 @@ class ReaderServiceSliceTest {
         AtomicInteger thrown = new AtomicInteger();
         return (PbsrRespRepo) Proxy.newProxyInstance(PbsrRespRepo.class.getClassLoader(),
                 new Class<?>[]{PbsrRespRepo.class}, (proxy, method, args) -> {
+                    // args[3] = e2e (SCRUM-55 added emission_id as args[2])
                     if ("upsert".equals(method.getName())
-                            && failTx.test(Integer.parseInt(((String) args[2]).substring(4)))
+                            && failTx.test(Integer.parseInt(((String) args[3]).substring(4)))
                             && thrown.getAndIncrement() < failures) {
                         throw new CannotAcquireLockException("ERROR: restart transaction:"
                                 + " TransactionRetryWithProtoRefreshError: RETRY_SERIALIZABLE"

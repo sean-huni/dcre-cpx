@@ -1,5 +1,6 @@
 package za.co.fnb.dcre.pxr.bdd;
 
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -10,6 +11,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import za.co.fnb.dcre.pxr.CrwSourceTables;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +45,12 @@ public class PxrReaderSteps {
     private boolean omitOrgnlMsgId;
     private final List<String> txBlocks = new ArrayList<>();
     private JobExecution lastRun;
+
+    /** CRW-owned source tables the reader correlates against (never in the pxr changelog). */
+    @Before
+    public void bootstrapCrwSources() {
+        CrwSourceTables.ensure(jdbc);
+    }
 
     @Given("an PBSR reply file {string} answering original message {string}")
     public void replyFile(String fileName, String msgId) {
