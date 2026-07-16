@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- SCRUM-55: correlate each PBSR verdict to the emitting CRW batch
+         (crw_emission.outbound_msg_id, Task 1). NULL = registry had no row
+         at ingest time (fail-open ingest, fail-closed correlation). -->
+    <changeSet id="003-pbsr-emission-fk" author="dcre">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="pbsr_resp" columnName="emission_id"/></not>
+        </preConditions>
+        <addColumn tableName="pbsr_resp">
+            <column name="emission_id" type="UUID"/>
+        </addColumn>
+        <createIndex tableName="pbsr_resp" indexName="ix_pbsr_emission">
+            <column name="emission_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
