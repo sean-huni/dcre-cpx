@@ -51,7 +51,7 @@ Precedence: yml default < real environment variable.
 
 | Env var | Default | Purpose |
 |---|---|---|
-| `DCRE_DB_URL` | `jdbc:postgresql://localhost:26257/dcre_collections?sslmode=disable` | Shared collections DB (CockroachDB via the PostgreSQL driver) |
+| `DCRE_DB_URL` | `jdbc:postgresql://localhost:26257/dcre_col?sslmode=disable` | Shared collections DB (CockroachDB via the PostgreSQL driver) |
 | `DCRE_DB_USER` | `root` | DB user |
 | `DCRE_DB_PASSWORD` | (empty) | DB password |
 | `DCRE_EXCHANGE_ROOT` | `../../../../../infra/dcre-infra/exchange` | Exchange root for the outcome seam (AGT sets `/exchange` in-cluster) |
