@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(properties = {"spring.batch.job.enabled=false", "dcre.exchange-root=build/test-exchange"})
 class PxrJobTest {
@@ -93,6 +94,12 @@ class PxrJobTest {
                 "SELECT reason FROM pbsr_resp WHERE response_file=? AND e2e='E2E-1'", String.class, original));
         assertEquals("MSG-0001", jdbc.queryForObject(
                 "SELECT orgnl_msg_id FROM pbsr_resp WHERE response_file=? AND e2e='E2E-1'", String.class, original));
+
+        // SCRUM-58: without JOB_NAME env the seam name self-describes the module.
+        Path outcome = Path.of("build/test-exchange/outcomes/local-pxr-" + run.getId());
+        assertTrue(Files.exists(outcome), "seam fallback must be local-pxr-<executionId>, missing: " + outcome);
+        assertEquals("BUSINESS_ACCEPTED", Files.readString(outcome).strip(),
+                "verdict semantics stay byte-exact across the listener swap");
 
         JobExecution replay = jobOperator.start(pxrJob, new JobParametersBuilder()
                 .addString("arrival.id", UUID.randomUUID().toString(), true)
