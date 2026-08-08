@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * SCRUM-58: response_file widens 128 -> 512 to match
- * file_arrival.physical_filename(512). Before the widening a 129+ char reply
- * name registered in agt_ops, then crashed the reader insert mid-flow
- * (spec 1.4, verified 001-cpx.xml:13). The replay guard
- * UNIQUE (response_file, e2e) must survive the widening untouched.
+ * SCRUM-58: response_file is VARCHAR(512) to match
+ * file_arrival.physical_filename(512). On a narrower column a 129+ char reply
+ * name registered in agt_ops, then crashed the reader insert (spec 1.4). The v1
+ * baseline declares that width in the createTable, so this guards the BASELINE
+ * width alongside the replay guard UNIQUE (response_file, e2e).
  */
 @SpringBootTest(properties = {"spring.batch.job.enabled=false", "dcre.exchange-root=build/test-exchange"})
 class ResponseFileWidthIT {
@@ -60,7 +60,7 @@ class ResponseFileWidthIT {
     }
 
     @Test
-    void replayGuardUniqueSurvivesWidening() {
+    void replayGuardUniqueEnforcedAtBaselineWidth() {
         final String name = "20260716_FNB_PBSR_guard_RESP.xml";
         jdbc.update(RAW_INSERT, name, "MSG-W2", "E2E-W2", "ACSC");
 
