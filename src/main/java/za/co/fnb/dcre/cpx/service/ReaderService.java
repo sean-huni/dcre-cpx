@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr.service;
+package za.co.fnb.dcre.cpx.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
-import za.co.fnb.dcre.pxr.data.repo.PbsrRespRepo;
+import za.co.fnb.dcre.cpx.data.repo.PbsrRespRepo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,7 +60,7 @@ public class ReaderService {
     private final int sliceSize;
 
     public ReaderService(final PbsrRespRepo repo, final PlatformTransactionManager txManager,
-                         @Value("${dcre.pxr.ingest-slice-size:10000}") final int sliceSize) {
+                         @Value("${dcre.cpx.ingest-slice-size:10000}") final int sliceSize) {
         this.repo = repo;
         // Each slice commits in its OWN transaction so a 300k-row reply
         // ratchets progress slice by slice; and a CRDB 40001 abort poisons the
@@ -81,7 +81,7 @@ public class ReaderService {
         UUID emissionId = repo.findEmissionIdByOutboundMsgId(orgnlMsgId).orElse(null);
         Set<String> memberE2e = emissionId == null ? null : new HashSet<>(repo.findMemberE2e(emissionId));
         if (emissionId == null) {
-            log.warn("unmatched stage=PXR arrival=- seq=-1 e2e=- reason=UNKNOWN_OUTBOUND_MSG file={}",
+            log.warn("unmatched stage=CPX arrival=- seq=-1 e2e=- reason=UNKNOWN_OUTBOUND_MSG file={}",
                     responseFile);
         }
         List<Verdict> verdicts = parse(fileText);
@@ -111,7 +111,7 @@ public class ReaderService {
                     int persisted = 0;
                     for (final Verdict verdict : slice) {
                         if (memberE2e != null && !memberE2e.contains(verdict.e2e())) {
-                            log.warn("excluded stage=PXR arrival=- seq=-1 e2e={} reason=FOREIGN_E2E file={}",
+                            log.warn("excluded stage=CPX arrival=- seq=-1 e2e={} reason=FOREIGN_E2E file={}",
                                     verdict.e2e(), responseFile);
                             continue;
                         }

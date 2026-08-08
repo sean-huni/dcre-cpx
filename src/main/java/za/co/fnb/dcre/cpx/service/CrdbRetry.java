@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr.service;
+package za.co.fnb.dcre.cpx.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ final class CrdbRetry {
                 }
                 final long backoffMs = (BASE_BACKOFF_MS << (attempt - 1))
                         + ThreadLocalRandom.current().nextLong(BASE_BACKOFF_MS);
-                log.warn("retrying stage=PXR op={} attempt={}/{} after {} backoffMs={}",
+                log.warn("retrying stage=CPX op={} attempt={}/{} after {} backoffMs={}",
                         op, attempt, MAX_ATTEMPTS, e.getClass().getSimpleName(), backoffMs);
                 sleep(backoffMs);
             }

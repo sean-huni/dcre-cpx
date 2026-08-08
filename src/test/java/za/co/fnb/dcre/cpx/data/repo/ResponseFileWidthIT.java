@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr.data.repo;
+package za.co.fnb.dcre.cpx.data.repo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * SCRUM-58: response_file widens 128 -> 512 to match
  * file_arrival.physical_filename(512). Before the widening a 129+ char reply
  * name registered in agt_ops, then crashed the reader insert mid-flow
- * (spec 1.4, verified 001-pxr.xml:13). The replay guard
+ * (spec 1.4, verified 001-cpx.xml:13). The replay guard
  * UNIQUE (response_file, e2e) must survive the widening untouched.
  */
 @SpringBootTest(properties = {"spring.batch.job.enabled=false", "dcre.exchange-root=build/test-exchange"})

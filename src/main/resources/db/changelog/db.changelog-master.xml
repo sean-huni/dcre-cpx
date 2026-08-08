@@ -5,9 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="db/changelog/2026/07/001-pxr.xml"/>
+    <include file="db/changelog/2026/07/001-cpx.xml"/>
     <include file="db/changelog/2026/07/002-batch-metadata.xml"/>
     <include file="db/changelog/2026/07/003-emission-fk.xml"/>
-    <include file="db/changelog/2026/07/004-pbsr-resp-width-pxr.xml"/>
+    <include file="db/changelog/2026/07/004-pbsr-resp-width-cpx.xml"/>
 
 </databaseChangeLog>

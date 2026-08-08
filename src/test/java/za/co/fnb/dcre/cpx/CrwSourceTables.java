@@ -1,12 +1,12 @@
-package za.co.fnb.dcre.pxr;
+package za.co.fnb.dcre.cpx;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Test bootstrap for the CRW-owned source tables the reader correlates
- * against. PXR does NOT own this DDL (crw does, 001-crw.xml + 003-split.xml
+ * against. CPX does NOT own this DDL (crw does, 001-crw.xml + 003-split.xml
  * on the crw repo); tests create the column shapes via plain JDBC, the same
- * pattern PRG uses for its bootstrap sources. Never add crw DDL to the pxr
+ * pattern PRG uses for its bootstrap sources. Never add crw DDL to the cpx
  * changelog.
  */
 public final class CrwSourceTables {
