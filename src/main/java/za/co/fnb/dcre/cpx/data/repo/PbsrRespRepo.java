@@ -1,10 +1,10 @@
-package za.co.fnb.dcre.pxr.data.repo;
+package za.co.fnb.dcre.cpx.data.repo;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-import za.co.fnb.dcre.pxr.data.model.PbsrRespEntity;
+import za.co.fnb.dcre.cpx.data.model.PbsrRespEntity;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr.service;
+package za.co.fnb.dcre.cpx.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +13,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.CockroachContainer;
 import org.testcontainers.utility.DockerImageName;
-import za.co.fnb.dcre.pxr.CrwSourceTables;
-import za.co.fnb.dcre.pxr.data.repo.PbsrRespRepo;
+import za.co.fnb.dcre.cpx.CrwSourceTables;
+import za.co.fnb.dcre.cpx.data.repo.PbsrRespRepo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;

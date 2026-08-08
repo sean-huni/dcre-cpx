@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr.data.model;
+package za.co.fnb.dcre.cpx.data.model;
 
 import org.springframework.data.relational.core.mapping.Table;
 import za.co.fnb.dcre.platform.persistence.BaseEntity;

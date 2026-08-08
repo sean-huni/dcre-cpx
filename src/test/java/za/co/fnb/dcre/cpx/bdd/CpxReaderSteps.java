@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr.bdd;
+package za.co.fnb.dcre.cpx.bdd;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -11,7 +11,7 @@ import org.springframework.batch.core.job.parameters.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import za.co.fnb.dcre.pxr.CrwSourceTables;
+import za.co.fnb.dcre.cpx.CrwSourceTables;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * [SYNTHETIC-CONTRACT R-35] reply shape: one OrgnlMsgId element, then repeated
  * Tx blocks of OrgnlEndToEndId + TxSts with an optional Rsn.
  */
-public class PxrReaderSteps {
+public class CpxReaderSteps {
 
     @Autowired
-    Job pxrJob;
+    Job cpxJob;
 
     @Autowired
     JobOperator jobOperator;
@@ -46,7 +46,7 @@ public class PxrReaderSteps {
     private final List<String> txBlocks = new ArrayList<>();
     private JobExecution lastRun;
 
-    /** CRW-owned source tables the reader correlates against (never in the pxr changelog). */
+    /** CRW-owned source tables the reader correlates against (never in the cpx changelog). */
     @Before
     public void bootstrapCrwSources() {
         CrwSourceTables.ensure(jdbc);
@@ -131,9 +131,9 @@ public class PxrReaderSteps {
     }
 
     private void runJob() throws Exception {
-        Path input = Files.createTempDirectory("pxr-bdd").resolve(responseFile);
+        Path input = Files.createTempDirectory("cpx-bdd").resolve(responseFile);
         Files.writeString(input, buildReply());
-        lastRun = jobOperator.start(pxrJob, new JobParametersBuilder()
+        lastRun = jobOperator.start(cpxJob, new JobParametersBuilder()
                 .addString("arrival.id", UUID.randomUUID().toString(), true)
                 .addString("input.file", input.toString(), false)
                 .addString("original.name", responseFile, false)

@@ -8,7 +8,7 @@
     <!-- SCRUM-58 (spec 1.4): a 129+ char reply name registers in agt_ops
          (file_arrival.physical_filename is 512) then crashes the reader
          insert mid-flow. Metadata-only widening in CRDB. -->
-    <changeSet id="004-pbsr-resp-width-pxr" author="dcre">
+    <changeSet id="004-pbsr-resp-width-cpx" author="dcre">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="pbsr_resp" columnName="response_file"/>
         </preConditions>

@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr.service;
+package za.co.fnb.dcre.cpx.service;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -15,7 +15,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.CockroachContainer;
 import org.testcontainers.utility.DockerImageName;
-import za.co.fnb.dcre.pxr.CrwSourceTables;
+import za.co.fnb.dcre.cpx.CrwSourceTables;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * SCRUM-55 Task 8: PXR resolves OrgnlMsgId to the emitting CRW batch.
+ * SCRUM-55 Task 8: CPX resolves OrgnlMsgId to the emitting CRW batch.
  * Membership is fail-closed (a foreign e2e is never ingested) while ingest
  * itself is fail-open when the emission registry has no row for the
  * OrgnlMsgId: statuses are still truth even if CRW's registry is behind.
@@ -90,7 +90,7 @@ class BatchCorrelationIT {
         assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM pbsr_resp WHERE response_file=?"
                         + " AND e2e='E2E-Z'", Integer.class, responseFile),
                 "foreign e2e is fail-closed, never ingested");
-        assertTrue(warns().stream().anyMatch(m -> m.contains("stage=PXR")
+        assertTrue(warns().stream().anyMatch(m -> m.contains("stage=CPX")
                         && m.contains("e2e=E2E-Z") && m.contains("reason=FOREIGN_E2E")),
                 "foreign e2e exclusion must WARN, got: " + warns());
     }

@@ -1,4 +1,4 @@
-package za.co.fnb.dcre.pxr;
+package za.co.fnb.dcre.cpx;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(properties = {"spring.batch.job.enabled=false", "dcre.exchange-root=build/test-exchange"})
-class PxrJobTest {
+class CpxJobTest {
 
     static final CockroachContainer CRDB =
             new CockroachContainer(DockerImageName.parse("cockroachdb/cockroach:v26.2.3"));
@@ -45,7 +45,7 @@ class PxrJobTest {
     static Path dir;
 
     @Autowired
-    Job pxrJob;
+    Job cpxJob;
 
     @Autowired
     JobOperator jobOperator;
@@ -53,7 +53,7 @@ class PxrJobTest {
     @Autowired
     JdbcTemplate jdbc;
 
-    /** CRW-owned source tables the reader correlates against (never in the pxr changelog). */
+    /** CRW-owned source tables the reader correlates against (never in the cpx changelog). */
     @BeforeEach
     void bootstrapCrwSources() {
         CrwSourceTables.ensure(jdbc);
@@ -76,7 +76,7 @@ class PxrJobTest {
         Path input = dir.resolve(original);
         Files.writeString(input, REPLY);
 
-        JobExecution run = jobOperator.start(pxrJob, new JobParametersBuilder()
+        JobExecution run = jobOperator.start(cpxJob, new JobParametersBuilder()
                 .addString("arrival.id", UUID.randomUUID().toString(), true)
                 .addString("input.file", input.toString(), false)
                 .addString("original.name", original, false)
@@ -96,12 +96,12 @@ class PxrJobTest {
                 "SELECT orgnl_msg_id FROM pbsr_resp WHERE response_file=? AND e2e='E2E-1'", String.class, original));
 
         // SCRUM-58: without JOB_NAME env the seam name self-describes the module.
-        Path outcome = Path.of("build/test-exchange/outcomes/local-pxr-" + run.getId());
-        assertTrue(Files.exists(outcome), "seam fallback must be local-pxr-<executionId>, missing: " + outcome);
+        Path outcome = Path.of("build/test-exchange/outcomes/local-cpx-" + run.getId());
+        assertTrue(Files.exists(outcome), "seam fallback must be local-cpx-<executionId>, missing: " + outcome);
         assertEquals("BUSINESS_ACCEPTED", Files.readString(outcome).strip(),
                 "verdict semantics stay byte-exact across the listener swap");
 
-        JobExecution replay = jobOperator.start(pxrJob, new JobParametersBuilder()
+        JobExecution replay = jobOperator.start(cpxJob, new JobParametersBuilder()
                 .addString("arrival.id", UUID.randomUUID().toString(), true)
                 .addString("input.file", input.toString(), false)
                 .addString("original.name", original, false)

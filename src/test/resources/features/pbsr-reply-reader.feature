@@ -1,6 +1,6 @@
-@pxr
+@cpx
 Feature: PBSR reply file ingestion
-  The PXR reader picks up incoming _PBSR reply files from the exchange and stores
+  The CPX reader picks up incoming _PBSR reply files from the exchange and stores
   one verdict row per transaction block, so downstream collections processing can
   react to each end-to-end payment outcome individually (fan-out per R-17).
   Replaying the same reply file must never duplicate verdicts.
