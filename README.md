@@ -4,7 +4,7 @@ PBSR response reader: an ephemeral Spring Batch job that ingests Fintegrate PBSR
 
 ## What it does
 
-CPX is the PBSR leg of the DCRE Collections response flow: `IXR | SXR | CPX -> ext_tx_status -> PRG`. When Fintegrate drops a reply file whose name carries the `_PBSR` token into the exchange, AGT's fint-resp route launches CPX as a short-lived Kubernetes Job (unknown reply tokens quarantine fail-closed). CPX parses the reply, one `<OrgnlMsgId>` plus repeated `<Tx>` blocks of `<OrgnlEndToEndId>` + `<TxSts>` + optional `<Rsn>` ([SYNTHETIC-CONTRACT R-35] shape), and upserts one `pbsr_resp` row per Tx block. PBSR carries the final per-transaction statuses and ranks highest in the `ext_tx_status` consolidation (precedence PBSR > SBSR > ISR > CTV, R-17) that PRG reads.
+CPX is the PBSR leg of the DCRE Collections response flow: `CIX | CSX | CPX -> ext_tx_status -> CRG`. When Fintegrate drops a reply file whose name carries the `_PBSR` token into the exchange, AGT's fint-resp route launches CPX as a short-lived Kubernetes Job (unknown reply tokens quarantine fail-closed). CPX parses the reply, one `<OrgnlMsgId>` plus repeated `<Tx>` blocks of `<OrgnlEndToEndId>` + `<TxSts>` + optional `<Rsn>` ([SYNTHETIC-CONTRACT R-35] shape), and upserts one `pbsr_resp` row per Tx block. PBSR carries the final per-transaction statuses and ranks highest in the `ext_tx_status` consolidation (precedence PBSR > SBSR > ISR > CTV, R-17) that CRG reads.
 
 ## Architecture and principles
 
@@ -12,11 +12,11 @@ CPX is the PBSR leg of the DCRE Collections response flow: `IXR | SXR | CPX -> e
 - **12FactorApp Alignment (https://12factor.net/)**: config strictly from the environment over committed working dev defaults in `application.yml` (clean clone runs with NO `.env`); stateless one-shot process whose JVM exit code is the job verdict (`ExitCodeMain` from platform-batch, R-34); CockroachDB and the exchange directory are attached backing resources.
 - **Idempotent restart semantics**: the upsert targets the business identity, `INSERT ... ON CONFLICT (response_file, e2e) DO UPDATE` (CRDB `UPSERT` arbitrates on the PK only, so the business key needs `ON CONFLICT`). Large replies commit in bounded slices (SCRUM-42: one giant serializable transaction is unrefreshable at 300k rows, RETRY_SERIALIZABLE), each slice in its own `REQUIRES_NEW` transaction behind a bounded 40001 retry (`CrdbRetry`, 5 attempts, exponential backoff); committed slices stand when a later slice fails, and a restart no-ops over them and resumes the rest. The step itself carries the shared `CrdbRetryExceptionHandler("CPX")` for commit-time aborts. `StaleExecutionSweeper.abandonStale(ds, "CPX_BATCH_", 60)` runs before launch so a relaunch after a pod kill never throws JobExecutionAlreadyRunning (A-39a). Kill-resume is chaos-validated fleet-wide (2026-07-15: SIGKILL at every stage, same-identity relaunch, zero duplicates).
 - **Outcome seam (R-35)**: on COMPLETED the job writes `BUSINESS_ACCEPTED` to `<exchange-root>/outcomes/<JOB_NAME>`. A non-COMPLETED run writes nothing: the exit code and the Kubernetes Failed condition are the witnesses; AGT treats absence as never-success (R-33).
-- **Isolated batch metadata**: Liquibase-owned copy of the Batch 6 DDL under prefix `CPX_BATCH_` (`spring.batch.jdbc.initialize-schema: never`), with per-service Liquibase history tables `cpx_databasechangelog` / `cpx_databasechangeloglock` on the shared DB.
+- **Isolated batch metadata**: Liquibase-owned copy of the Batch 6 DDL under prefix `CPX_BATCH_` (`dcre.batch.table-prefix`; Boot 4.1 no longer binds `spring.batch.jdbc.*`), with per-service Liquibase history tables `cpx_databasechangelog` / `cpx_databasechangeloglock` on the shared DB.
 
 Job parameters (R-16): `arrival.id` identifying; `input.file` and `original.name` non-identifying; `original.name` becomes the `response_file` identity column.
 
-Data: `pbsr_resp` (Liquibase `2026/07/001-cpx.xml`): `response_file`, `orgnl_msg_id`, `e2e`, `status`, `reason` (nullable) plus the BaseEntity columns; `UNIQUE (response_file, e2e)`.
+Data: `pbsr_resp` (Liquibase `2026/08/002-pbsr-resp.xml`, the v1 baseline): `response_file` VARCHAR(512), `orgnl_msg_id`, `emission_id` (nullable, SCRUM-55 batch correlation, no FK), `e2e`, `status`, `reason` (nullable) plus the BaseEntity columns; `UNIQUE (response_file, e2e)` and index `ix_pbsr_emission`.
 
 ## Prerequisites
 
