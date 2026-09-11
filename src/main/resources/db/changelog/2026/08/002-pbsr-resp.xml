@@ -49,6 +49,10 @@
          ============================================================================ -->
 
     <changeSet id="cpx-v1-pbsr-resp" author="dcre">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="pbsr_resp"/></not>
+        </preConditions>
+        
         <createTable tableName="pbsr_resp">
             <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
