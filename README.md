@@ -117,7 +117,7 @@ kubectl set env -n dcre deploy/dcre-agt AGT_CPX_IMAGE=dcre-cpx:$VERSION
 
 The image is `eclipse-temurin:25-jre-alpine` carrying `build/libs/cpx-2.0.jar`. AGT resolves it from `AGT_CPX_IMAGE` (empty by default, which leaves the stage launch-disabled). dcre-infra `scripts/switch-version.sh` does not set it: its stage list still names the retired `PXR` (checked 2026-09-28). CPX is not deployed as a server: per reply AGT mints a one-shot Kubernetes Job (`backoffLimit: 0`, `restartPolicy: Never`) in the collections flow namespace (AGT `AGT_NAMESPACE_COL`, default `dcre-col`), passing `arrival.id` / `input.file` / `original.name` as program args and `JOB_NAME`, `DCRE_DB_URL` (AGT `service-db-url`, `dcre_col`), `DCRE_EXCHANGE_ROOT=/exchange`, `DCRE_AGTOPS_DB_URL`, `DCRE_AGTOPS_DB_USER` in the env, with the shared exchange PVC mounted at `/exchange` (AGT `JobLauncher` on origin/dev, checked 2026-09-28).
 
-Releases are uniform digits-only 3-component SemVer git tags across the fleet.
+Release tags are digits-only 3-component SemVer; this repo carries 1.0.0 through 2.2.1, and tagging is not uniform across the fleet (the payments stages carry none; `git ls-remote --tags`, checked 2026-09-28).
 
 ## Related repositories
 
